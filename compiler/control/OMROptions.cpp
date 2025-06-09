@@ -1254,6 +1254,7 @@ TR::OptionTable OMR::Options::_jitOptions[] = {
    {"traceOpts",                        "L\tdump each optimization name",                 SET_OPTION_BIT(TR_TraceOpts), "P" },
    {"traceOpts=",                       "L{regex}\tlist of optimizations to trace", TR::Options::setRegex, offsetof(OMR::Options, _optsToTrace), 0, "P"},
    {"traceOptTreeLowering",             "L\ttrace tree lowering optimization",             TR::Options::traceOptimization, treeLowering,   0, "P"},
+   {"traceOptTrees=",                   "L{regex}\tlist of optimizations after which to dump trees", TR::Options::setRegex, offsetof(OMR::Options, _optsToDumpTrees), 0, "P"},
    {"traceOSR",                         "L\ttrace OSR",                                    SET_OPTION_BIT(TR_TraceOSR), "P"},
    {"traceOSRDefAnalysis",              "L\ttrace OSR reaching definitions analysis",       TR::Options::traceOptimization, osrDefAnalysis, 0, "P"},
 #ifdef J9_PROJECT_SPECIFIC
@@ -1700,8 +1701,6 @@ uint32_t      OMR::Options::_cpuExpensiveCompThreshold = 0; // not initialized
 int32_t       OMR::Options::_deterministicMode = -1; // -1 means we're not in any deterministic mode
 int32_t       OMR::Options::_maxPeekedBytecodeSize = 100000;
 
-int32_t       OMR::Options::INLINE_failedToDevirtualize          = 0;
-int32_t       OMR::Options::INLINE_failedToDevirtualizeInterface = 0;
 int32_t       OMR::Options::INLINE_fanInCallGraphFactor          = 90;
 int32_t       OMR::Options::INLINE_calleeToBig                   = 0;
 int32_t       OMR::Options::INLINE_calleeToDeep                  = 0;
@@ -3907,7 +3906,7 @@ OMR::Options::jitPostProcess()
 bool
 OMR::Options::requiresLogFile()
    {
-   if (self()->getOptsToTrace())
+   if (self()->getOptsToTrace() || self()->getOptsToDumpTrees())
       return true;
 
    // note: enumerators with different word maps can't be or'ed together
